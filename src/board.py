@@ -112,6 +112,28 @@ class Board:
                     possible_move_row = possible_move_row + row_inc
                     possible_move_col = possible_move_col + col_inc
 
+        def king_moves():
+            possible_moves = [(row + 1, col),
+                            (row - 1, col), 
+                            (row, col - 1), 
+                            (row, col + 1), 
+                            (row + 1, col + 1), 
+                            (row + 1, col - 1),
+                            (row - 1, col + 1),
+                            (row - 1, col - 1)
+                            ]
+
+            for possible_move in possible_moves:
+                possible_move_row, possible_move_col = possible_move
+                if Square.in_range(possible_move_row, possible_move_col):
+                    initial = Square(row, col)
+                    final = Square(possible_move_row, possible_move_col)
+
+                    move = Move(initial, final)
+
+                    if self.squares[possible_move_row][possible_move_col].isempty_or_enemy(piece.color):
+                        piece.add_move(move)
+
 
         if isinstance(piece, Pawn): pawn_moves()
 
@@ -136,7 +158,7 @@ class Board:
             )
         
         elif isinstance(piece, King):
-            pass
+            king_moves()
 
     def _create(self):
         '''
