@@ -92,8 +92,8 @@ class Board:
 
                 while True:
                     if Square.in_range(possible_move_row, possible_move_col):
-                        initial = Move(row, col)
-                        final = Move(possible_move_row, possible_move_col)
+                        initial = Square(row, col)
+                        final = Square(possible_move_row, possible_move_col)
 
                         move = Move(initial, final)
 
@@ -196,8 +196,11 @@ class Board:
         self.squares[row_other][0] = Square(row_other, 0, Rook(color))
         self.squares[row_other][7] = Square(row_other, 7, Rook(color))
 
+        self.squares[3][7] = Square(row_other, 7, Rook('white'))
+
         #queens
         self.squares[row_other][3] = Square(row_other, 3, Queen(color))
+        self.squares[4][3] = Square(row_other, 3, Queen('white'))
 
         #kings
         self.squares[row_other][4] = Square(row_other, 4, King(color))

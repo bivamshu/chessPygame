@@ -15,7 +15,7 @@ class Main:
     def mainloop(self):
         screen = self.screen
         game = self.game
-        board = self.game.boardre
+        board = self.game.board 
         dragger = self.game.dragger
 
         while True:
