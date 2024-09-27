@@ -6,6 +6,9 @@ class Square:
                             #when an object is created. 
         self.piece = piece #the default value of piece is None. This means that the square is empty. 
 
+    def __eq__(self, other):
+        return self.row == other.row and self.column == other.column
+
     def has_piece(self):
         '''This function checks if self.piece, an attribute of the Square class, that tells whether or not the square of a chessboard has
         a piece or not and which piece it has, is equal to None or not. If self.piece is not equal to None, that would mean that it is 

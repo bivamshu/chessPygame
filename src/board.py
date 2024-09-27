@@ -9,9 +9,26 @@ class Board:
         objects squares as elements. Then it calls the create and add pieces methods. The add pieces method is called twice so that 
         pieces are created for each color.'''
         self.squares = [[0, 0, 0, 0, 0, 0, 0, 0,] for col in range(COLUMNS)]
+        self.last_move = None 
         self._create()
         self._add_pieces('white')
         self._add_pieces('black')
+
+    def move(self, piece, move):
+        initial = move.initial
+        final = move.final
+
+        self.squares[initial.row][initial.column].piece = None 
+        self.squares [final.row][final.column].piece = piece
+
+        piece.moved = True
+
+        piece.clear_moves()     
+        self.last_move = move
+
+    def valid_move(self, piece, move):
+        
+        return move in piece.moves
 
     def calc_moves(self, piece, row, col):
 
@@ -133,7 +150,6 @@ class Board:
 
                     if self.squares[possible_move_row][possible_move_col].isempty_or_enemy(piece.color):
                         piece.add_move(move)
-
 
         if isinstance(piece, Pawn): pawn_moves()
 
