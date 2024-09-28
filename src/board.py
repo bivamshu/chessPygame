@@ -5,9 +5,11 @@ from move import Move
 
 class Board:
     def __init__(self):
-        '''This function initializes the varaibles when an object of this class is created. It first creates a 8X8 array that will keep
+        '''
+        This function initializes the varaibles when an object of this class is created. It first creates a 8X8 array that will keep
         objects squares as elements. Then it calls the create and add pieces methods. The add pieces method is called twice so that 
-        pieces are created for each color.'''
+        pieces are created for each color.
+        '''
         self.squares = [[0, 0, 0, 0, 0, 0, 0, 0,] for col in range(COLUMNS)]
         self.last_move = None 
         self._create()
