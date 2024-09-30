@@ -4,7 +4,7 @@ from const import *
 from board import Board
 from dragger import Dragger
 from move import Move
-
+from config import Config
 
 class Game:
     def __init__(self):
@@ -13,14 +13,14 @@ class Game:
         self.dragger = Dragger()
         self.next_player = 'white'
         self.hovered_square = None
+        self.config = Config()
 
     def show_bg(self, surface):
+        theme = self.config.theme
+
         for row in range(ROWS):
             for col in range(COLUMNS):
-                if(row + col) % 2 == 0:
-                    color = (234, 235, 200) #light green
-                else:
-                    color = (119, 154, 88) #dark green
+                color = theme.bg.light if (row + col) % 2 == 0 else theme.bg.dark
 
                 rect = (col * SQSIZE, row * SQSIZE, SQSIZE, SQSIZE)
 
@@ -41,22 +41,26 @@ class Game:
                         surface.blit(img, piece.texture_rect)
     
     def show_moves(self, surface):
+        theme = self.config.theme
+
         if self.dragger.dragging:
             piece = self.dragger.piece
 
             for move in piece.moves:
-                color = '#C86464' if (move.final.row + move.final.column) % 2 == 0 else '#C84646'
+                color = theme.moves.light if (move.final.row + move.final.column) % 2 == 0 else theme.moves.dark
                 rect = (move.final.column * SQSIZE, move.final.row * SQSIZE, SQSIZE, SQSIZE)
                 pygame.draw.rect(surface, color, rect)
 
     def last_move(self, surface):
+        theme = self.config.theme
+
         if self.board.last_move:
             initial = self.board.last_move.initial 
             final = self.board.last_move.final
 
         
             for pos in [initial, final]:
-                color = (244, 247, 116) if (pos.row + pos.column) % 2 == 0 else (172, 195, 51)
+                color = theme.trace.light if (pos.row + pos.column) % 2 == 0 else theme.trace.dark
                 rect = (pos.column * SQSIZE, pos.row * SQSIZE, SQSIZE, SQSIZE)
                 pygame.draw.rect(surface, color, rect)
 
@@ -72,6 +76,8 @@ class Game:
     def set_hover(self, row, col):
         self.hovered_square = self.board.squares[row][col]
                     
+    def change_theme(self):
+        self.config.change_themes()
 
 
         
