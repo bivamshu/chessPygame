@@ -1,10 +1,22 @@
 class Square:
+
+    ALPHACOLS = {0: 'A',
+                1: 'B',
+                2: 'C',
+                3: 'D',
+                4: 'E',
+                5: 'F',
+                6: 'G',
+                7: 'H'
+                }
+
     def __init__(self, row, column, piece = None):
         #initializes the Square class
         self.row = row #self.row assigns the value of the parameter received by the class when an object of the class is created.
         self.column = column #self.column is a property of a square. column is the argument that is passed into the the function 
                             #when an object is created. 
         self.piece = piece #the default value of piece is None. This means that the square is empty. 
+        self.alphacol = self.ALPHACOLS[column]
 
     def __eq__(self, other):
         return self.row == other.row and self.column == other.column
@@ -52,3 +64,17 @@ class Square:
                 return False
             
         return True
+    
+    @staticmethod
+
+    def get_alphacol(col):
+        ALPHACOLS = {0: 'A',
+                1: 'B',
+                2: 'C',
+                3: 'D',
+                4: 'E',
+                5: 'F',
+                6: 'G',
+                7: 'H'
+                }
+        return ALPHACOLS[col]
