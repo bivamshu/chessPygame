@@ -122,10 +122,3 @@ class Game:
 
     def reset(self):
         self.__init__()
-
-    #write a function to add a timer for chess
-    def add_timer(self, player):
-        if player == 'white':
-            self.config.white_timer.start()
-        else:
-            self.config.black_timer.start()
