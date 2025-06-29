@@ -454,3 +454,17 @@ class Board:
 
         # king
         self.squares[row_other][4] = Square(row_other, 4, King(color))
+
+    def get_all_valid_moves(self, color):
+        all_moves = []
+        for rows in range(ROWS):
+            for cols in range(COLS):
+                square = self.squares[rows][cols]
+                if square.has_piece():
+                    piece = square.piece
+                    if piece.color == color: 
+                        self.calc_moves(piece, rows, cols)
+                        for move in piece.moves:
+                            all_moves.append((piece, move))
+        
+        return all_moves
