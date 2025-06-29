@@ -124,7 +124,10 @@ class Main:
                     elif event.type == pygame.MOUSEMOTION:
                         motion_row = event.pos[1] // SQSIZE
                         motion_col = event.pos[0] // SQSIZE
-                        game.set_hover(motion_row, motion_col)
+
+                        #Only call set_hover if within bounds
+                        if 0 <= motion_row < ROWS and 0 <= motion_col < COLS:
+                            game.set_hover(motion_row, motion_col)
 
                         if dragger.dragging:
                             dragger.update_mouse(event.pos)
@@ -132,8 +135,13 @@ class Main:
                             game.show_last_move(screen)
                             game.show_moves(screen)
                             game.show_pieces(screen)
-                            game.show_hover(screen)
+
+                            #Only show hover if within bounds
+                            if 0 <= motion_row < ROWS and 0 <= motion_col < COLS:
+                                game.show_hover(screen)
+
                             dragger.update_blit(screen)
+
 
                     elif event.type == pygame.MOUSEBUTTONUP:
                         if dragger.dragging:
@@ -153,6 +161,15 @@ class Main:
                                 game.show_last_move(screen)
                                 game.show_pieces(screen)
                                 game.next_turn()
+
+                                valid_moves = board.get_all_valid_moves(game.next_player)
+                                if not valid_moves:
+                                    if board.is_checkmate(game.next_player):
+                                        print(f"{game.next_player.capitalize()} is checkmated!")
+                                    else:
+                                        print(f"Stalemate! {game.next_player.capitalize()} has no valid moves.")
+                                    
+                                    self.game_state = 'home'
 
                         dragger.undrag_piece()
 
