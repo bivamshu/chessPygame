@@ -44,6 +44,8 @@ class Board:
         piece.moved = True
         piece.clear_moves()
         self.last_move = move
+        self.last_piece = piece
+
 
     def valid_move(self, piece, move):
         return move in piece.moves
@@ -209,3 +211,75 @@ class Board:
         ]
         for cls, col in placements:
             self.squares[row_other][col] = Square(row_other, col, cls(color))
+
+    def count_moves(self):
+        count = 0
+        for row in self.squares:
+            for square in row:
+                piece = square.piece
+                if piece:
+                    count += len(getattr(piece, 'moves', []))
+        return count
+
+
+    def fen(self):
+        piece_to_fen = {
+            Pawn: 'p',
+            Knight: 'n',
+            Bishop: 'b',
+            Rook: 'r',
+            Queen: 'q',
+            King: 'k',
+        }
+
+        fen_rows = []
+        for row in self.squares:
+            empty = 0
+            fen_row = ''
+            for square in row:
+                piece = square.piece
+                if piece is None:
+                    empty += 1
+                else:
+                    if empty > 0:
+                        fen_row += str(empty)
+                        empty = 0
+                    symbol = piece_to_fen.get(type(piece), '?')
+                    fen_row += symbol.upper() if piece.color == 'white' else symbol
+            if empty > 0:
+                fen_row += str(empty)
+            fen_rows.append(fen_row)
+
+        board_part = '/'.join(fen_rows)
+
+        # Active color (assumes white moves first; toggle based on self.last_move)
+        active_color = 'w' if not self.last_piece or self.last_piece.color == 'black' else 'b'
+
+        # Castling rights
+        castling_rights = ''
+        for row in [0, 7]:
+            king = self.squares[row][4].piece
+            if isinstance(king, King) and not king.moved:
+                if isinstance(self.squares[row][7].piece, Rook) and not self.squares[row][7].piece.moved:
+                    castling_rights += 'K' if row == 7 else 'k'
+                if isinstance(self.squares[row][0].piece, Rook) and not self.squares[row][0].piece.moved:
+                    castling_rights += 'Q' if row == 7 else 'q'
+        if not castling_rights:
+            castling_rights = '-'
+
+        # En passant target square
+        en_passant = '-'
+        if isinstance(self.last_piece, Pawn):
+            diff = abs(self.last_move.initial.row - self.last_move.final.row)
+            if diff == 2:
+                col = self.last_move.initial.col
+                mid_row = (self.last_move.initial.row + self.last_move.final.row) // 2
+                en_passant = f"{chr(col + ord('a'))}{8 - mid_row}"
+
+        # Halfmove clock (simplified to 0 always)
+        halfmove_clock = '0'
+
+        # Fullmove number (count of full turns)
+        fullmove_number = '1' if not self.last_move else str((self.count_moves() // 2) + 1)
+
+        return f"{board_part} {active_color} {castling_rights} {en_passant} {halfmove_clock} {fullmove_number}"

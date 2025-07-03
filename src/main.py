@@ -80,6 +80,8 @@ class Main:
                         game.play_sound(captured)
                         game.next_turn()
 
+                        print('FEN:', board.fen())
+
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -161,6 +163,9 @@ class Main:
                                 game.show_last_move(screen)
                                 game.show_pieces(screen)
                                 game.next_turn()
+
+                                print('FEN:', board.fen())
+
 
                                 valid_moves = board.get_all_valid_moves(game.next_player)
                                 if not valid_moves:
