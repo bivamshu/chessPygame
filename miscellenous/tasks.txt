@@ -1,0 +1,31 @@
+Match manager 
+    Track wins, losses, draws per bot ✔️
+
+    Win rate calculation ✔️
+
+    Show winner after each match ✔️
+
+    Show % of games played, results so far, and elapsed time ⏱️
+
+    Store move history per game (in memory or PGN format)
+
+    Randomize starting positions (e.g. use FENs or Chess960) 🔀
+
+    Real-time board visualization during game play
+
+    End-of-series summary with stats table
+
+    Optional: Save results to file (CSV or JSON)
+
+    💡 Recommended Additions (highly useful)
+    Game replay system (load saved moves to replay any game)
+
+    Estimated Elo difference from win rates (Bayesian or logistic method)
+
+    Log engine evaluation scores per move (optional toggle)
+
+    Opening diversity metrics (e.g. avoid repeating same 10-ply path too often)
+
+    Add game termination reasons (checkmate, stalemate, resignation)
+
+    Time each move (for performance profiling or time control later)

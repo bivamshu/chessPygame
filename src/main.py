@@ -70,7 +70,7 @@ class Main:
 
                 # Let the bot play when it's its turn
                 if game.next_player == 'black' and not dragger.dragging:
-                    from intelligent_bot import IntelligentBot
+                    from v2 import IntelligentBot
                     bot = IntelligentBot(board, depth=3)
 
                     piece, move = bot.select_move('black')

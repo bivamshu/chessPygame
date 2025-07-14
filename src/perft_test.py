@@ -22,7 +22,7 @@ def perft(board, depth):
 
 if __name__ == '__main__':
     board = Board()
-    for depth in range(1, 5):
+    for depth in range(1, 6):
         start = time.time()
         nodes = perft(board, depth)
         end = time.time()

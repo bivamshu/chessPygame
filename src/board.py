@@ -376,3 +376,91 @@ class Board:
 
         piece.moved = piece_moved
 
+    def load_fen(self, fen):
+        piece_map = {
+            'p': Pawn,
+            'n': Knight,
+            'b': Bishop,
+            'r': Rook,
+            'q': Queen,
+            'k': King
+        }
+
+        parts = fen.strip().split()
+        board_part = parts[0]
+        active_color = parts[1]
+        castling_rights = parts[2]
+        en_passant = parts[3]
+        # halfmove_clock = int(parts[4])  # optional, if you track this
+        # fullmove_number = int(parts[5])  # optional
+
+        # Clear board first
+        for row in range(ROWS):
+            for col in range(COLS):
+                self.squares[row][col].piece = None
+
+        rows = board_part.split('/')
+        for row_idx, fen_row in enumerate(rows):
+            col_idx = 0
+            for char in fen_row:
+                if char.isdigit():
+                    col_idx += int(char)  # empty squares
+                else:
+                    color = 'white' if char.isupper() else 'black'
+                    piece_class = piece_map[char.lower()]
+                    self.squares[row_idx][col_idx].piece = piece_class(color)
+                    col_idx += 1
+
+        # Set next player to move
+        self.next_player = 'white' if active_color == 'w' else 'black'
+
+        # Set castling rights (optional - implement flags on King and Rooks or Board)
+        # For simplicity, you can set moved = True/False on rooks/kings accordingly:
+        # Example:
+        for row in [0, 7]:
+            king = self.squares[row][4].piece
+            if isinstance(king, King):
+                king.moved = True  # default to moved, will clear below if rights exist
+                # Reset all rook moved states as well to True, then clear below if rights allow
+                for col in [0, 7]:
+                    rook = self.squares[row][col].piece
+                    if isinstance(rook, Rook):
+                        rook.moved = True
+
+        if 'K' in castling_rights:
+            if isinstance(self.squares[7][4].piece, King):
+                self.squares[7][4].piece.moved = False
+            if isinstance(self.squares[7][7].piece, Rook):
+                self.squares[7][7].piece.moved = False
+        if 'Q' in castling_rights:
+            if isinstance(self.squares[7][4].piece, King):
+                self.squares[7][4].piece.moved = False
+            if isinstance(self.squares[7][0].piece, Rook):
+                self.squares[7][0].piece.moved = False
+        if 'k' in castling_rights:
+            if isinstance(self.squares[0][4].piece, King):
+                self.squares[0][4].piece.moved = False
+            if isinstance(self.squares[0][7].piece, Rook):
+                self.squares[0][7].piece.moved = False
+        if 'q' in castling_rights:
+            if isinstance(self.squares[0][4].piece, King):
+                self.squares[0][4].piece.moved = False
+            if isinstance(self.squares[0][0].piece, Rook):
+                self.squares[0][0].piece.moved = False
+
+        # Set en passant target square
+        if en_passant != '-':
+            col = ord(en_passant[0]) - ord('a')
+            row = 8 - int(en_passant[1])
+            # The pawn that can be captured en passant is on the row behind this target square
+            # We'll mark that pawn's en_passant flag True
+            ep_pawn_row = row + 1 if self.next_player == 'black' else row - 1
+            if 0 <= ep_pawn_row < ROWS:
+                pawn = self.squares[ep_pawn_row][col].piece
+                if isinstance(pawn, Pawn) and pawn.color != self.next_player:
+                    pawn.en_passant = True
+
+        # Optionally reset move history or other states if you track them
+        self.move_history = []
+        self.last_move = None
+        self.last_piece = None
