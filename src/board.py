@@ -14,6 +14,9 @@ class Board:
         self._create()
         self._add_pieces('white')
         self._add_pieces('black')
+        self.next_player = 'white'
+        self.move_history = []
+
 
     def move(self, piece, move, testing=False):
         initial = move.initial
@@ -88,10 +91,13 @@ class Board:
         return False
 
     def causes_check(self, piece, move):
-        temp_board = copy.deepcopy(self)
-        temp_piece = copy.deepcopy(piece)
-        temp_board.move(temp_piece, move, testing=True)
-        return temp_board.in_check(piece.color)
+        self.make_move(piece, move)
+        self.next_turn()
+        is_in_check = self.in_check(piece.color)
+        self.prev_turn()
+        self.unmake_move()
+        return is_in_check
+
 
     def is_checkmate(self, color):
         if not self.in_check(color): return False
@@ -220,6 +226,12 @@ class Board:
                 if piece:
                     count += len(getattr(piece, 'moves', []))
         return count
+    
+    def next_turn(self):
+        self.next_player = 'white' if self.next_player == 'black' else 'black'
+
+    def prev_turn(self):
+        self.next_player = 'white' if self.next_player == 'black' else 'black'
 
 
     def fen(self):
@@ -283,3 +295,84 @@ class Board:
         fullmove_number = '1' if not self.last_move else str((self.count_moves() // 2) + 1)
 
         return f"{board_part} {active_color} {castling_rights} {en_passant} {halfmove_clock} {fullmove_number}"
+
+    def make_move(self, piece, move):
+        initial = move.initial
+        final = move.final
+        captured = self.squares[final.row][final.col].piece
+        promotion = False
+        en_passant_capture = None
+        rook_move = None
+
+        # Handle en passant capture
+        if isinstance(piece, Pawn):
+            if initial.col != final.col and captured is None:
+                en_passant_row = final.row + (1 if piece.color == 'white' else -1)
+                en_passant_capture = self.squares[en_passant_row][final.col].piece
+                self.squares[en_passant_row][final.col].piece = None
+
+        # Handle castling rook move
+        if isinstance(piece, King) and abs(initial.col - final.col) == 2:
+            row = initial.row
+            if final.col == 6:  # King-side
+                rook = self.squares[row][7].piece
+                self.squares[row][7].piece = None
+                self.squares[row][5].piece = rook
+                rook_move = (rook, Square(row, 7), Square(row, 5))
+            else:  # Queen-side
+                rook = self.squares[row][0].piece
+                self.squares[row][0].piece = None
+                self.squares[row][3].piece = rook
+                rook_move = (rook, Square(row, 0), Square(row, 3))
+
+        # Save en passant state
+        en_passant_prev = piece.en_passant if isinstance(piece, Pawn) else None
+
+        # Move piece
+        self.squares[initial.row][initial.col].piece = None
+        self.squares[final.row][final.col].piece = piece
+
+        # Handle promotion
+        if isinstance(piece, Pawn) and (final.row == 0 or final.row == 7):
+            piece = Queen(piece.color)
+            self.squares[final.row][final.col].piece = piece
+            promotion = True
+
+        # Save to history
+        self.move_history.append((piece, move, captured, piece.moved, promotion, en_passant_capture, en_passant_prev, rook_move))
+        piece.moved = True
+
+
+    def unmake_move(self):
+        if not self.move_history:
+            return
+
+        piece, move, captured, piece_moved, promotion, en_passant_capture, en_passant_prev, rook_move = self.move_history.pop()
+        initial = move.initial
+        final = move.final
+
+        # Undo promotion
+        if promotion:
+            piece = Pawn(piece.color)
+
+        # Put piece back
+        self.squares[initial.row][initial.col].piece = piece
+        self.squares[final.row][final.col].piece = captured
+
+        # Restore en passant capture
+        if en_passant_capture:
+            row = final.row + (1 if piece.color == 'white' else -1)
+            self.squares[row][final.col].piece = en_passant_capture
+
+        # Restore en passant flag
+        if isinstance(piece, Pawn):
+            piece.en_passant = en_passant_prev
+
+        # Undo castling rook move
+        if rook_move:
+            rook, start, end = rook_move
+            self.squares[start.row][start.col].piece = rook
+            self.squares[end.row][end.col].piece = None
+
+        piece.moved = piece_moved
+
