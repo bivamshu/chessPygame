@@ -1,9 +1,5 @@
 Match manager 
-    Track wins, losses, draws per bot ✔️
 
-    Win rate calculation ✔️
-
-    Show winner after each match ✔️
 
     Show % of games played, results so far, and elapsed time ⏱️
 

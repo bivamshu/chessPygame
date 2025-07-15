@@ -26,6 +26,12 @@ class Square:
 
     def isempty_or_enemy(self, color):
         return self.isempty() or self.has_enemy_piece(color)
+    
+    @property
+    def name(self):
+        rank = 8 - self.row  # Convert row index to chess rank (0 -> 8, 1 -> 7, ..., 7 -> 1)
+        return f"{self.alphacol}{rank}"
+
 
     @staticmethod
     def in_range(*args):
