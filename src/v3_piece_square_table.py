@@ -94,7 +94,7 @@ class IntelligentBot:
                     score += total if piece.color == self.color else -total
         return score
 
-    def select_move(self, color):
+    def select_move(self, color, return_eval=False):
         self.color = color
         best_score = float('-inf')
         best_move = None
@@ -117,7 +117,11 @@ class IntelligentBot:
                 best_move = move
                 best_piece = piece
 
-        return best_piece, best_move
+        if return_eval:
+            return best_piece, best_move, best_score
+        else:
+            return best_piece, best_move
+
 
 
     def minimax(self, depth, alpha, beta, maximizing):

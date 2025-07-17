@@ -16,12 +16,21 @@ class Board:
         self._add_pieces('black')
         self.next_player = 'white'
         self.move_history = []
+        self.halfmove_clock = 0
 
 
     def move(self, piece, move, testing=False):
         initial = move.initial
         final = move.final
         en_passant_empty = self.squares[final.row][final.col].isempty()
+        captured_piece = self.squares[final.row][final.col].piece
+
+        # Update halfmove clock
+        if isinstance(piece, Pawn) or captured_piece:
+            self.halfmove_clock = 0
+        else:
+            self.halfmove_clock += 1
+
         self.squares[initial.row][initial.col].piece = None
         self.squares[final.row][final.col].piece = piece
 
@@ -42,7 +51,6 @@ class Board:
                 rook = piece.left_rook if (diff < 0) else piece.right_rook
                 if rook and rook.moves:
                     self.move(rook, rook.moves[-1])
-
 
         piece.moved = True
         piece.clear_moves()
@@ -464,3 +472,8 @@ class Board:
         self.move_history = []
         self.last_move = None
         self.last_piece = None
+
+    @property
+    def current_turn(self):
+        return self.next_player
+

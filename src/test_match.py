@@ -1,5 +1,5 @@
 from match_manager import MatchManager
-from v3 import IntelligentBot as BotV1
+from v3_piece_square_table import IntelligentBot as BotV1
 from v2 import IntelligentBot as BotV2
 
 if __name__ == "__main__":
